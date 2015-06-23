@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
+#include <string.h>
+
+void show_time(time_t);
 
 void show_info(const struct utmp* u)
 {
@@ -10,11 +14,18 @@ void show_info(const struct utmp* u)
     printf(" ");
     printf("%-8.8s", u->ut_line);
     printf(" ");
-    printf("%11d", u->ut_time);
+    show_time(u->ut_time);
     printf(" ");
     printf("(%s)", u->ut_host);
 
     printf("\n");
+}
+
+void show_time(time_t t)
+{
+    char* t_str = ctime(&t);
+    t_str[strlen(t_str)-1] = 0;
+    printf("%s", t_str);
 }
 
 int main()
