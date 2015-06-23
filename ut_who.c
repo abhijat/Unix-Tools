@@ -7,6 +7,10 @@
 #include <string.h>
 
 void show_time(time_t);
+int utmp_open(const char*);
+void utmp_reload();
+struct utmp* utmp_next();
+void utmp_close();
 
 void show_info(const struct utmp* u)
 {
@@ -30,18 +34,11 @@ void show_time(time_t t)
 
 int main()
 {
-    int utmp_fd;
-    if ( (utmp_fd = open(UTMP_FILE, O_RDONLY)) == -1 ) {
-        perror(UTMP_FILE);
+    if (utmp_open(UTMP_FILE) == -1)
         exit(1);
-    }
-
-    struct utmp curr;
-    size_t rec_len = sizeof(curr);
-    while (read(utmp_fd, &curr, rec_len) == rec_len) {
-        if (curr.ut_type == LOGIN_PROCESS)
-            show_info(&curr);
-    }
-
+    struct utmp* u;
+    while ( (u = utmp_next()) != NULL)
+	if (u->ut_type == LOGIN_PROCESS)
+	    show_info(u);
     return 0;
 }
